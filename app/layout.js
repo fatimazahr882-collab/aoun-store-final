@@ -1,8 +1,9 @@
 import './globals.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import { CheckoutProvider } from './context/CheckoutContext'; // Import the new provider
 
-// Restoring your full, correct SEO metadata
+// This is your full, correct SEO metadata.
 export const metadata = {
   title: {
     template: '%s | Aoun Store',
@@ -16,8 +17,8 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         {/* 
-          NO FAVICON LINKS HERE. 
-          Next.js will automatically use the favicon.ico file you placed in the app/ folder.
+          No favicon links are needed here. 
+          Next.js will automatically use the favicon.ico file located in your app/ folder.
         */}
         <link 
           rel="stylesheet" 
@@ -25,9 +26,17 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        {/* 
+          ===================================================================
+          THE CHANGE: We wrap the entire application in the CheckoutProvider.
+          This makes the checkout "brain" available to all pages.
+          ===================================================================
+        */}
+        <CheckoutProvider>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </CheckoutProvider>
       </body>
     </html>
   );

@@ -3,6 +3,17 @@
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 
+// A simple, safe function to create URL-friendly slugs
+function slugify(text) {
+  if (!text) return '';
+  return text.toString().toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+}
+
 function ProductCard({ product, index }) {
     const cardRef = useRef(null);
     useEffect(() => {
@@ -13,12 +24,13 @@ function ProductCard({ product, index }) {
             }
         }, { threshold: 0.1 });
         if (cardRef.current) observer.observe(cardRef.current);
-        return () => observer.disconnect();
+        return () => { if (cardRef.current) observer.unobserve(cardRef.current); };
     }, []);
 
+    // We can be confident 'product' is valid here because of the filter below
     const frontImage = product.image_urls?.[0] || '';
     const backImage = product.image_urls?.[1] || frontImage;
-    const slug = product.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    const slug = slugify(product.name);
 
     return (
         <Link href={`/products/${product.id}-${slug}`} ref={cardRef} className="product-card neon-border" style={{ transitionDelay: `${index * 100}ms` }}>
@@ -40,11 +52,18 @@ function ProductCard({ product, index }) {
 export default function ProductGrid({ products }) {
     return (
         <div className="products-container">
-            {products?.length > 0 ? (
-                products.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)
-            ) : (
-                <p style={{ gridColumn: '1 / -1', textAlign: 'center' }}>No products found.</p>
-            )}
+            {/* 
+              ===================================================================
+              THE DEEP FIX: We filter the 'products' array BEFORE we map it.
+              This ensures we only ever try to render valid products with a name and ID.
+              This prevents the <Link> component from ever receiving bad data.
+              ===================================================================
+            */}
+            {products && products
+              .filter(product => product && product.id && product.name)
+              .map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
+            ))}
         </div>
     );
 }

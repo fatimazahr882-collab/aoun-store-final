@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+// This is the simple, original version of your Header component.
+// It is no longer a 'use client' component and has no cart logic.
 export default function Header() {
   return (
     <>
@@ -16,6 +18,7 @@ export default function Header() {
               <li><Link href="/" className="neon-border"><div className="neon-border-content">Home</div></Link></li>
               <li><Link href="/shop" className="neon-border"><div className="neon-border-content">All Products</div></Link></li>
               <li><Link href="/contact" className="neon-border"><div className="neon-border-content">Contact Us</div></Link></li>
+              {/* The cart icon has been removed from the list. */}
             </ul>
           </nav>
         </div>

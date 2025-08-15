@@ -1,73 +1,68 @@
-"use client"; // This must be a client component for interactivity
+'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Import the router
+import { useRouter } from 'next/navigation';
 
 export default function ProductInteractions({ product }) {
-    
-    const router = useRouter(); // Initialize the router
     const [quantity, setQuantity] = useState(1);
     const [selectedColor, setSelectedColor] = useState(null);
+    const router = useRouter();
 
-    const handleColorSelect = (color) => {
-        setSelectedColor(color);
-    };
-
-    const changeQuantity = (amount) => {
-        setQuantity(prevQuantity => {
-            const newQuantity = prevQuantity + amount;
-            return newQuantity < 1 ? 1 : newQuantity;
+    const handleBuyNow = () => {
+        if (product.colors && product.colors.length > 0 && !selectedColor) {
+            alert('Please select a color before buying.');
+            return;
+        }
+        
+        // We create a "URL-safe" package of the product details.
+        const params = new URLSearchParams({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: quantity,
+            color: selectedColor || '',
         });
+        
+        // Redirect to checkout with the data package.
+        router.push(`/checkout?${params.toString()}`);
     };
     
-    // This is the upgraded "Buy Now" function
-    const handleBuyNow = () => {
-        // First, check if a color needs to be selected
-        if (product.colors && product.colors.length > 0 && !selectedColor) {
-            alert("Please select a color first!");
-            return; // Stop the function if no color is chosen
-        }
-
-        // Create the URL for the checkout page with all the product info
-        // We pass the data in the URL itself (e.g., ?id=24&quantity=2&color=red)
-        const checkoutUrl = `/checkout?id=${product.id}&name=${encodeURIComponent(product.name)}&price=${product.price}&quantity=${quantity}&color=${encodeURIComponent(selectedColor || 'N/A')}`;
-
-        // Tell the router to navigate to that URL
-        router.push(checkoutUrl);
-    };
-
     return (
-        <>
-            {/* Color Selector */}
+        <div className="product-details">
+            <h1 className="product-detail-title">{product.name}</h1>
+            <div className="product-detail-price">PKR {product.price.toFixed(2)}</div>
+            <div className="description-box neon-border">
+                <div className="neon-border-content"><p>{product.description || 'No description available.'}</p></div>
+            </div>
+
             {product.colors && product.colors.length > 0 && (
                 <div className="color-selector">
                     <h4>Color:</h4>
                     <div className="color-options">
-                        {product.colors.map(color => (
+                        {product.colors.map((color) => (
                             <div
                                 key={color}
                                 className={`color-circle ${selectedColor === color ? 'selected' : ''}`}
                                 style={{ backgroundColor: color.toLowerCase() }}
                                 title={color}
-                                onClick={() => handleColorSelect(color)}
+                                onClick={() => setSelectedColor(color)}
                             />
                         ))}
                     </div>
                 </div>
             )}
 
-            {/* Quantity Selector */}
             <div className="quantity-selector">
-                <button className="quantity-btn" onClick={() => changeQuantity(-1)}>-</button>
+                <button className="quantity-btn" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
                 <input type="number" id="quantity-input" value={quantity} readOnly />
-                <button className="quantity-btn" onClick={() => changeQuantity(1)}>+</button>
+                <button className="quantity-btn" onClick={() => setQuantity(q => q + 1)}>+</button>
             </div>
 
-            {/* Action Buttons */}
             <div className="product-actions">
-                <a className="neon-border btn-secondary"><div className="neon-border-content"><i className="fas fa-cart-plus"></i> Add to Cart</div></a>
-                <a className="neon-border btn-primary shaky-loop" onClick={handleBuyNow}><div className="neon-border-content"><i className="fas fa-money-bill-wave"></i> Buy Now</div></a>
+                <a className="neon-border btn-primary shaky-loop" onClick={handleBuyNow}>
+                    <div className="neon-border-content"><i className="fas fa-money-bill-wave"></i> Buy Now</div>
+                </a>
             </div>
-        </>
+        </div>
     );
 }

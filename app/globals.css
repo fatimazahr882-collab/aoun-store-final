@@ -334,4 +334,21 @@ footer { background: var(--dark); color: white; padding: 40px 20px 20px; margin-
 }
 .collections-container .collection-item {
     pointer-events: auto;
+}/* Add/replace these styles at the end of app/globals.css */
+
+/* This is the cloned button that flies to the cart */
+.fly-to-cart {
+    z-index: 2000; /* Ensure it's on top of everything */
+    transition: all 1s ease-in-out; /* Animate all properties */
+    pointer-events: none;
+}
+
+/* We use a separate class to trigger the animation */
+.fly-to-cart.flying {
+    opacity: 1;
+    top: var(--cart-top, 50px);
+    left: var(--cart-left, 90%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
 }
