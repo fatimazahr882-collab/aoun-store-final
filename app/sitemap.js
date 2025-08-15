@@ -1,6 +1,7 @@
-import { supabase } from './lib/supabaseClient';
+// This path is now correct. It goes UP one level from 'app' to the root.
+import { supabase } from '../lib/supabaseClient';
 
-const URL = 'https://www.aounstore.shop'; // IMPORTANT: Change to your real domain
+const URL = 'https://www.aounstore.shop'; // IMPORTANT: Change to your real domain later
 
 export default async function sitemap() {
   const { data: products } = await supabase.from('product').select('id, name, created_at');
@@ -13,9 +14,11 @@ export default async function sitemap() {
     };
   });
 
-  return [
+  const staticUrls = [
     { url: URL, lastModified: new Date().toISOString() },
     { url: `${URL}/shop`, lastModified: new Date().toISOString() },
-    ...productUrls,
+    // Add other static pages here
   ];
+
+  return [...staticUrls, ...productUrls];
 }
