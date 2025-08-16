@@ -1,34 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image'; // Assuming you are using next/image now
 import { useEffect, useRef } from 'react';
 
-// A simple, safe function to create URL-friendly slugs
-function slugify(text) {
-  if (!text) return '';
-  return text.toString().toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w-]+/g, '')
-    .replace(/--+/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '');
-}
+function slugify(text) { /* ... */ }
 
-function ProductCard({ product, index }) {
+function ProductCard({ product, index }) { // We receive 'index' here
     const cardRef = useRef(null);
-    useEffect(() => {
-        const observer = new IntersectionObserver(([entry]) => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
-            }
-        }, { threshold: 0.1 });
-        if (cardRef.current) observer.observe(cardRef.current);
-        return () => { if (cardRef.current) observer.unobserve(cardRef.current); };
-    }, []);
+    useEffect(() => { /* ... */ }, []);
 
-    // We can be confident 'product' is valid here because of the filter below
-    const frontImage = product.image_urls?.[0] || '';
+    const frontImage = product.image_urls?.[0] || '/placeholder.png';
     const backImage = product.image_urls?.[1] || frontImage;
     const slug = slugify(product.name);
 
@@ -37,13 +19,28 @@ function ProductCard({ product, index }) {
             <div className="neon-border-content">
                 <div className="product-image-container">
                     {product.price < product.original_price && <div className="sale-tag">SALE</div>}
-                    <img src={frontImage} alt={product.name} className="product-image front-image" loading="lazy" />
-                    <img src={backImage} alt={product.name} className="product-image back-image" loading="lazy" />
+                    <Image 
+                      src={frontImage} 
+                      alt={product.name} 
+                      fill 
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 23vw"
+                      style={{ objectFit: 'cover' }} 
+                      className="product-image front-image"
+                      // --- THIS IS THE FIX ---
+                      // Load the first 4 images immediately, lazy load the rest.
+                      priority={index < 4} 
+                    />
+                    <Image 
+                      src={backImage} 
+                      alt={product.name} 
+                      fill 
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 23vw"
+                      style={{ objectFit: 'cover' }} 
+                      className="product-image back-image"
+                      priority={index < 4}
+                    />
                 </div>
-                <div className="product-info">
-                    <h3 className="product-title">{product.name}</h3>
-                    <div className="product-price">PKR {product.price.toFixed(2)}</div>
-                </div>
+                <div className="product-info">{/* ... */}</div>
             </div>
         </Link>
     );
@@ -52,16 +49,9 @@ function ProductCard({ product, index }) {
 export default function ProductGrid({ products }) {
     return (
         <div className="products-container">
-            {/* 
-              ===================================================================
-              THE DEEP FIX: We filter the 'products' array BEFORE we map it.
-              This ensures we only ever try to render valid products with a name and ID.
-              This prevents the <Link> component from ever receiving bad data.
-              ===================================================================
-            */}
             {products && products
-              .filter(product => product && product.id && product.name)
-              .map((product, index) => (
+              .filter(p => p && p.id && p.name)
+              .map((product, index) => ( // Pass the index to the ProductCard
                 <ProductCard key={product.id} product={product} index={index} />
             ))}
         </div>
