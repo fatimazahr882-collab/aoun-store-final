@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import HeroSection from './components/HeroSection';
 import CollectionsSection from './components/CollectionsSection';
 import ProductGrid from './components/ProductGrid';

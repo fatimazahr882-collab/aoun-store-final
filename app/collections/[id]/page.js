@@ -1,4 +1,4 @@
-import { supabase } from '../../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import ProductGrid from '../../components/ProductGrid';
 import Link from 'next/link';
 

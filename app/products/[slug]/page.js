@@ -1,4 +1,4 @@
-import { supabase } from '../../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import ProductImageGallery from '../../components/ProductImageGallery';
 import ProductInteractions from '../../components/ProductInteractions';

@@ -1,11 +1,13 @@
-// This path is now correct. It goes UP one level from 'app' to the root.
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
-const URL = 'https://www.aounstore.shop'; // IMPORTANT: Change to your real domain later
+const URL = 'https://aoun-store-final.vercel.app';
 
 export default async function sitemap() {
-  const { data: products } = await supabase.from('product').select('id, name, created_at');
-
+  const { data: products, error } = await supabase.from('product').select('id, name, created_at');
+  if (error) {
+    console.error('Sitemap fetch error:', error);
+    return [];
+  }
   const productUrls = products.map((product) => {
     const slug = product.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
     return {
@@ -13,12 +15,9 @@ export default async function sitemap() {
       lastModified: new Date(product.created_at).toISOString(),
     };
   });
-
   const staticUrls = [
     { url: URL, lastModified: new Date().toISOString() },
     { url: `${URL}/shop`, lastModified: new Date().toISOString() },
-    // Add other static pages here
   ];
-
   return [...staticUrls, ...productUrls];
 }
