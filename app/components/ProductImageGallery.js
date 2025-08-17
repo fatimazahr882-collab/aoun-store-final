@@ -1,20 +1,20 @@
-"use client"; // This also needs to be an interactive component
+// products/components/ProductImageGallery.js
+
+"use client";
 
 import { useState } from 'react';
+import Image from 'next/image'; // 1. IMPORT THE NEXT.JS IMAGE COMPONENT
 
-// We receive the product's images as a "prop"
-export default function ProductImageGallery({ images, productName }) {
+// 2. ACCEPT THE 'priority' PROP TO IDENTIFY THE LCP ELEMENT
+export default function ProductImageGallery({ images, productName, priority = false }) {
     
-    // We use state to track the currently displayed main image
     const [mainImage, setMainImage] = useState(images?.[0] || '');
     const [isZoomed, setIsZoomed] = useState(false);
 
-    // This function runs when a user clicks a thumbnail
     const handleThumbnailClick = (newImageUrl) => {
         setMainImage(newImageUrl);
     };
 
-    // These functions handle opening and closing the zoom view
     const openZoom = () => setIsZoomed(true);
     const closeZoom = () => setIsZoomed(false);
 
@@ -22,26 +22,47 @@ export default function ProductImageGallery({ images, productName }) {
         <>
             <div className="product-images">
                 <div className="main-image-container" onClick={openZoom}>
-                    <img src={mainImage} alt={productName} className="main-image" />
+                    {/* 3. REPLACE <img> WITH <Image /> FOR THE MAIN IMAGE */}
+                    <Image 
+                        src={mainImage} 
+                        alt={productName} 
+                        className="main-image"
+                        // IMPORTANT: Provide the actual width and height of your source images
+                        width={800}
+                        height={800}
+                        sizes="(max-width: 768px) 100vw, 40vw"
+                        // 4. APPLY THE PRIORITY PROP HERE. THIS IS THE KEY LCP FIX.
+                        priority={priority}
+                    />
                 </div>
                 <div className="thumbnail-images">
                     {images?.map((url, index) => (
-                        <img 
+                        // 5. REPLACE <img> FOR THUMBNAILS. THESE WILL LAZY-LOAD AUTOMATICALLY.
+                        <Image 
                             key={index} 
                             src={url} 
                             alt={`Thumbnail of ${productName}`} 
                             className={`thumbnail-image ${mainImage === url ? 'active' : ''}`}
                             onClick={() => handleThumbnailClick(url)}
+                            // Use smaller dimensions for thumbnails
+                            width={100}
+                            height={100}
                         />
                     ))}
                 </div>
             </div>
 
-            {/* This is the zoom overlay, which is hidden by default */}
             {isZoomed && (
                 <div className="image-zoom-overlay active">
                     <span className="close-zoom" onClick={closeZoom}>×</span>
-                    <img src={mainImage} alt={`Zoomed view of ${productName}`} />
+                    {/* 6. REPLACE THE ZOOMED IMAGE AS WELL */}
+                    <Image 
+                        src={mainImage} 
+                        alt={`Zoomed view of ${productName}`}
+                        width={1200}
+                        height={1200}
+                        sizes="100vw"
+                    />
                 </div>
             )}
         </>

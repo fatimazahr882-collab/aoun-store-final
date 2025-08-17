@@ -1,10 +1,20 @@
+// app/layout.js
+
 import './globals.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { CheckoutProvider } from './context/CheckoutContext';
-import { SpeedInsights } from "@vercel/speed-insights/next"; // 1. IMPORT THE COMPONENT
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Inter } from 'next/font/google';
 
-// Your metadata object remains the same
+// 1. IMPORT THE NEW WRAPPER COMPONENT. The dynamic import is no longer here.
+import ClientComponents from './components/ClientComponents';
+
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+});
+
 export const metadata = {
   title: {
     template: '%s | Aoun Store',
@@ -15,9 +25,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.className}> 
       <head>
-        {/* ... (your head content: favicons, font awesome link) ... */}
+        {/* ... (your head content) ... */}
       </head>
       <body>
         <CheckoutProvider>
@@ -25,7 +35,10 @@ export default function RootLayout({ children }) {
           <main>{children}</main>
           <Footer />
         </CheckoutProvider>
-        <SpeedInsights /> {/* 2. ADD THE COMPONENT HERE, RIGHT BEFORE </body> */}
+        <SpeedInsights />
+        
+        {/* 2. RENDER THE WRAPPER COMPONENT. It will handle loading the WhatsApp button correctly. */}
+        <ClientComponents />
       </body>
     </html>
   );

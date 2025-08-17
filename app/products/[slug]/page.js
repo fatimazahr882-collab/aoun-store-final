@@ -1,8 +1,13 @@
+// app/products/[slug]/page.js
+
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import ProductImageGallery from '../../components/ProductImageGallery';
 import ProductInteractions from '../../components/ProductInteractions';
-import ProductGrid from '../../components/ProductGrid';
+import dynamic from 'next/dynamic'; // 1. IMPORT DYNAMIC
+
+// 2. DYNAMICALLY IMPORT THE 'ProductGrid'. ITS CODE WILL ONLY LOAD WHEN NEEDED.
+const ProductGrid = dynamic(() => import('../../components/ProductGrid'));
 
 function getIdFromSlug(slug = '') {
     return slug.split('-')[0];
@@ -24,6 +29,7 @@ export default async function ProductDetailPage({ params }) {
         return <h1 className="container" style={{ textAlign: 'center', padding: '40px' }}>Product not found!</h1>;
     }
     
+    // Data fetching for related products remains here
     let relatedProducts = [];
     if (product.collection) {
         const { data } = await supabase
@@ -52,14 +58,15 @@ export default async function ProductDetailPage({ params }) {
                 )}
                 
                 <div className="product-detail-container">
-                    <ProductImageGallery images={product.image_urls} productName={product.name} />
+                    {/* 3. PASS THE 'priority' PROP TO THE IMAGE GALLERY. THIS IS ESSENTIAL. */}
+                    <ProductImageGallery images={product.image_urls} productName={product.name} priority />
                     <ProductInteractions product={product} />
                 </div>
 
-                {/* This is the Related Products section. It is now correctly included. */}
                 {relatedProducts && relatedProducts.length > 0 && (
                     <div className="related-products-section" style={{ marginTop: '80px' }}>
                         <h2 className="section-title visible">Related Products</h2>
+                        {/* 4. The ProductGrid is now loaded dynamically, preventing it from blocking the initial page render. */}
                         <ProductGrid products={relatedProducts} />
                     </div>
                 )}

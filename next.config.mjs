@@ -3,18 +3,25 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        // This is for your banner images from the previous step.
+        // This is your existing rule for postimg.cc images.
         protocol: 'https',
         hostname: 'i.postimg.cc',
         port: '',
         pathname: '/**',
       },
       {
-        // THIS IS THE NEW PART: Add this block for your Supabase product images.
+        // This is your existing rule for Supabase product images.
         protocol: 'https',
-        hostname: 'dkoglkvbkxnvsobxigfm.supabase.co', // Your Supabase project hostname
+        hostname: 'dkoglkvbkxnvsobxigfm.supabase.co',
         port: '',
-        pathname: '/storage/v1/object/public/productimages/**', // The path to your public images bucket
+        pathname: '/storage/v1/object/public/productimages/**',
+      },
+      {
+        // THIS IS THE NEW RULE for your banner images from i.ibb.co.
+        protocol: 'https',
+        hostname: 'i.ibb.co',
+        port: '',
+        pathname: '/**',
       },
     ],
   },
