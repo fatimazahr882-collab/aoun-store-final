@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
 
-const URL = 'https://aoun-store-final.vercel.app';
+const URL = 'https://www.aounstore.shop/';
 
 export default async function sitemap() {
   const { data: products, error } = await supabase.from('product').select('id, name, created_at');
